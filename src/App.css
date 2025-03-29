@@ -1,0 +1,41 @@
+/* App.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-primary-light: #f8fafc;
+  --color-secondary-light: #ffffff;
+  --color-primary-dark: #0f172a;
+  --color-secondary-dark: #1e293b;
+}
+
+/* Theme Variables */
+.bg-primary-light {
+  background-color: var(--color-primary-light);
+}
+
+.bg-secondary-light {
+  background-color: var(--color-secondary-light);
+}
+
+.bg-primary-dark {
+  background-color: var(--color-primary-dark);
+}
+
+.bg-secondary-dark {
+  background-color: var(--color-secondary-dark);
+}
+
+/* Custom Styles */
+input:focus, select:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+}
+
+/* Transitions */
+.transition-colors {
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 200ms;
+}
