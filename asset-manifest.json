@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/Future-calculator/static/css/main.c1b9a128.css",
+    "main.js": "/Future-calculator/static/js/main.e88df400.js",
+    "index.html": "/Future-calculator/index.html",
+    "main.c1b9a128.css.map": "/Future-calculator/static/css/main.c1b9a128.css.map",
+    "main.e88df400.js.map": "/Future-calculator/static/js/main.e88df400.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.c1b9a128.css",
+    "static/js/main.e88df400.js"
+  ]
+}
