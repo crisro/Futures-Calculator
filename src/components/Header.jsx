@@ -12,9 +12,13 @@ const Header = ({ toggleTheme, theme, toggleSettings }) => {
     <header className="bg-white dark:bg-gray-800 shadow-md">
       <div className="container mx-auto px-4 py-3 flex justify-between items-center">
         <div className="flex items-center">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-blue-600 mr-2" viewBox="0 0 20 20" fill="currentColor">
-            <path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z" />
-            <path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z" />
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-blue-600 mr-2" viewBox="0 0 200 200" fill="none" stroke="currentColor">
+            {/* Simplified BITUNIX Logo */}
+            {/* Main circle */}
+            <circle cx="100" cy="100" r="90" fill="none" strokeWidth="6" />
+            
+            {/* BITUNIX text in center */}
+            <text x="100" y="110" fontSize="32" fontWeight="900" textAnchor="middle" fill="#b9f641">BITUNIX</text>
           </svg>
           <h1 className="text-xl font-bold text-gray-900 dark:text-white">
             {t('app.name')}
