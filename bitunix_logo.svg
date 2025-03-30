@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none" stroke="currentColor">
+  <!-- Main circle -->
+  <circle cx="100" cy="100" r="90" fill="none" stroke="#000" stroke-width="6" />
+  
+  <!-- Calculator icon -->
+  <rect x="140" y="60" width="30" height="40" fill="none" stroke="#000" stroke-width="2" />
+  <rect x="145" y="65" width="20" height="10" fill="none" stroke="#000" stroke-width="1" />
+  <line x1="145" y1="80" x2="165" y2="80" stroke="#000" stroke-width="1" />
+  <line x1="145" y1="85" x2="165" y2="85" stroke="#000" stroke-width="1" />
+  <line x1="145" y1="90" x2="165" y2="90" stroke="#000" stroke-width="1" />
+  <line x1="155" y1="80" x2="155" y2="90" stroke="#000" stroke-width="1" />
+  
+  <!-- Gear icons -->
+  <circle cx="100" cy="40" r="15" fill="none" stroke="#000" stroke-width="2" />
+  <path d="M100 25 L100 30 M100 50 L100 55 M85 40 L90 40 M110 40 L115 40 M90 30 L94 34 M106 46 L110 50 M90 50 L94 46 M106 34 L110 30" stroke="#000" stroke-width="2" />
+  <path d="M100 35 L105 45 L95 45 Z" fill="#000" />
+  
+  <circle cx="160" cy="150" r="15" fill="none" stroke="#000" stroke-width="2" />
+  <text x="160" y="155" font-size="16" text-anchor="middle" fill="#000">%</text>
+  
+  <!-- Chart elements -->
+  <polyline points="120,80 130,70 140,90 150,60 160,85" fill="none" stroke="#000" stroke-width="2" />
+  <circle cx="130" cy="70" r="3" fill="#000" />
+  <circle cx="140" cy="90" r="3" fill="#000" />
+  <circle cx="150" cy="60" r="3" fill="#000" />
+  <circle cx="160" cy="85" r="3" fill="#000" />
+  
+  <!-- Bottom chart -->
+  <polyline points="80,150 90,140 100,150 110,140 120,150 130,140 140,150" fill="none" stroke="#000" stroke-width="2" />
+  <circle cx="90" cy="140" r="3" fill="#000" />
+  <circle cx="110" cy="140" r="3" fill="#000" />
+  <circle cx="130" cy="140" r="3" fill="#000" />
+  <circle cx="100" cy="150" r="3" fill="#000" />
+  <circle cx="120" cy="150" r="3" fill="#000" />
+  <circle cx="140" cy="150" r="3" fill="#000" />
+  
+  <!-- Mobile app icon -->
+  <rect x="30" y="70" width="20" height="35" rx="3" fill="none" stroke="#000" stroke-width="2" />
+  <text x="40" y="85" font-size="14" text-anchor="middle" fill="#000">$</text>
+  <line x1="35" y1="95" x2="45" y2="95" stroke="#000" stroke-width="1" />
+  <line x1="35" y1="98" x2="45" y2="98" stroke="#000" stroke-width="1" />
+  <line x1="35" y1="101" x2="45" y2="101" stroke="#000" stroke-width="1" />
+  
+  <!-- Trading terminal -->
+  <rect x="55" y="70" width="25" height="35" rx="3" fill="none" stroke="#000" stroke-width="2" />
+  <rect x="58" y="75" width="8" height="8" rx="1" fill="none" stroke="#000" stroke-width="1" />
+  <rect x="69" y="75" width="8" height="8" rx="1" fill="none" stroke="#000" stroke-width="1" />
+  <rect x="58" y="86" width="8" height="8" rx="1" fill="none" stroke="#000" stroke-width="1" />
+  <rect x="69" y="86" width="8" height="8" rx="1" fill="none" stroke="#000" stroke-width="1" />
+  <text x="67" y="101" font-size="8" text-anchor="middle" fill="#000">TI</text>
+  
+  <!-- Radar/compass -->
+  <circle cx="40" cy="150" r="15" fill="none" stroke="#000" stroke-width="2" />
+  <circle cx="40" cy="150" r="5" fill="none" stroke="#000" stroke-width="1" />
+  <line x1="40" y1="135" x2="40" y2="165" stroke="#000" stroke-width="1" />
+  <line x1="25" y1="150" x2="55" y2="150" stroke="#000" stroke-width="1" />
+  <line x1="30" y1="140" x2="50" y2="160" stroke="#000" stroke-width="1" />
+  <line x1="30" y1="160" x2="50" y2="140" stroke="#000" stroke-width="1" />
+  
+  <!-- Server/database -->
+  <path d="M90 170 L90 155 L110 155 L110 170 Z" fill="none" stroke="#000" stroke-width="2" />
+  <rect x="95" y="160" width="5" height="5" fill="#000" />
+  <rect x="102" y="160" width="5" height="5" fill="#000" />
+  
+  <!-- BITUNIX text -->
+  <text x="100" y="120" font-size="20" font-weight="bold" text-anchor="middle" fill="#000">BITUNIX</text>
+</svg>
