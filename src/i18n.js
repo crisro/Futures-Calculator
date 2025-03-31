@@ -104,7 +104,8 @@ i18n
             deductFeeFromMargin: 'Deduct Fees from Margin',
             deductOpenFee: 'Deduct Opening Fee',
             deductCloseFee: 'Deduct Closing Fee',
-            closeOrderType: 'Closing Order Type'
+            closeOrderType: 'Closing Order Type',
+            marginAfterPnl: 'Margin After PNL'
           }
         }
       },
@@ -201,7 +202,8 @@ i18n
             deductFeeFromMargin: 'کسر کارمزد از مارجین',
             deductOpenFee: 'کسر کارمزد باز کردن معامله',
             deductCloseFee: 'کسر کارمزد بستن معامله',
-            closeOrderType: 'نوع سفارش بستن معامله'
+            closeOrderType: 'نوع سفارش بستن معامله',
+            marginAfterPnl: 'مارجین بعد از سود/زیان'
           }
         }
       }

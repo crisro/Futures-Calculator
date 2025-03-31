@@ -37,6 +37,7 @@ const defaultPosition = {
   deductOpenFee: false, // کم کردن کارمزد باز کردن معامله
   deductCloseFee: false, // کم کردن کارمزد بستن معامله
   closeOrderType: 'taker', // میکر یا تیکر بودن کارمزد بستن معامله
+  marginAfterPnl: true, // اضافه کردن مارجین بعد از محاسبه سود/زیان
 };
 
 export const CalculatorProvider = ({ children }) => {
@@ -111,10 +112,8 @@ export const CalculatorProvider = ({ children }) => {
       initialMargin = (entryPrice * positionSize) / leverage;
     }
     
-    // کم کردن کارمزد فاندینگ از مارجین
-    if (position.fundingFee != 0) {
-      initialMargin = initialMargin + position.fundingFee;
-    }
+    // Funding fee is no longer included in initial margin calculation
+    // It will only affect available margin and other derived calculations
     
     // Calculate opening transaction fees based on order type (maker/taker)
     const openFeeRate = position.orderType === 'maker' ? feeRates.maker : feeRates.taker;
@@ -127,6 +126,11 @@ export const CalculatorProvider = ({ children }) => {
     // Calculate available margin based on fee deduction options
     let availableMargin = initialMargin;
     
+    // Apply funding fee to available margin
+    if (position.fundingFee != 0) {
+      availableMargin += position.fundingFee;
+    }
+    
     // If deducting fees from margin, adjust the available margin
     if (position.deductFeeFromMargin) {
       if (position.deductOpenFee) {
@@ -137,7 +141,20 @@ export const CalculatorProvider = ({ children }) => {
       }
     }
     
+    // Calculate break-even price (entry price adjusted for fees)
+    let breakEvenPrice;
+    // Calculate total fees including opening and closing fees
+    const totalFees = openingTransactionFees + closingTransactionFees - position.fundingFee;
+    const feesPerUnit = totalFees / positionSize;
+    
+    if (positionType === 'long') {
+      breakEvenPrice = entryPrice + feesPerUnit;
+    } else { // short
+      breakEvenPrice = entryPrice - feesPerUnit;
+    }
+    
     // Calculate cost value based on fee deduction options
+    // Cost value is just the initial margin since funding fee is not included in initial margin
     let costValue = initialMargin;
     
     // Add opening fees if not deducted from margin
@@ -154,18 +171,7 @@ export const CalculatorProvider = ({ children }) => {
     // Calculate maintenance margin 
     const maintenanceMargin = positionSize * (mmr / 100) * currentPrice;
     
-    // Calculate unrealized PnL
-    let unrealizedPnL;
-    if (positionType === 'long') {
-      unrealizedPnL = (currentPrice - entryPrice) * positionSize;
-    } else { // short
-      unrealizedPnL = (entryPrice - currentPrice) * positionSize;
-    }
-    
-    // Calculate ROI
-    let roi;
-    roi = (unrealizedPnL * leverage) / (entryPrice * positionSize);
-    
+  
     // Calculate liquidation price based on margin mode
     let liquidationPrice;
     
@@ -218,17 +224,23 @@ export const CalculatorProvider = ({ children }) => {
       }
     }
     
-    // Calculate break-even price (entry price adjusted for fees)
-    let breakEvenPrice;
-    // Calculate total fees including opening and closing fees
-    const totalFees = openingTransactionFees + closingTransactionFees + position.fundingFee;
-    const feesPerUnit = totalFees / positionSize;
-    
+
+    // Calculate unrealized PnL
+    let unrealizedPnL;
     if (positionType === 'long') {
-      breakEvenPrice = entryPrice + feesPerUnit;
+      unrealizedPnL = (currentPrice - entryPrice) * positionSize - totalFees;
     } else { // short
-      breakEvenPrice = entryPrice - feesPerUnit;
+      unrealizedPnL = (entryPrice - currentPrice) * positionSize - totalFees;
     }
+    
+    // Apply margin after PNL if enabled
+    if (position.marginAfterPnl) {
+      availableMargin += unrealizedPnL;
+    }
+    
+    // Calculate ROI
+    let roi;
+    roi = (unrealizedPnL * leverage) / (entryPrice * positionSize);
     
     return {
       availableMargin,

@@ -640,12 +640,12 @@ const PositionForm = ({ positionId }) => {
                 value={position.fundingFee}
                 onChange={handleInputChange}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-                step="0.01"
+                step="1"
               />
             </div>
             
             {/* Deduct Fee From Margin - Aligned with Manual Margin */}
-            <div className="mb-2 flex items-center">
+            {/* <div className="mb-2 flex items-center">
               <label className="inline-flex items-center">
                 <input
                   type="checkbox"
@@ -661,7 +661,7 @@ const PositionForm = ({ positionId }) => {
             </div>
             
             {/* Deduct Opening Fee - only shown if deductFeeFromMargin is checked */}
-            {position.deductFeeFromMargin && (
+            {/*position.deductFeeFromMargin && (
               <div className="mb-2">
                 <label className="inline-flex items-center">
                   <input

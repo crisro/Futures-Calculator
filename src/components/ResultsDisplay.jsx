@@ -4,7 +4,7 @@ import { useCalculator } from '../contexts/CalculatorContext';
 
 const ResultsDisplay = ({ positionId }) => {
   const { t } = useTranslation();
-  const { calculations, positions } = useCalculator();
+  const { calculations, positions, updatePosition } = useCalculator();
   
   const position = positions.find(p => p.id === positionId);
   const results = calculations[positionId];
@@ -61,16 +61,28 @@ const ResultsDisplay = ({ positionId }) => {
           <p className="font-medium dark:text-white">{formatNumber(results.initialMargin)}</p>
         </div>
         
-        <div>
-          <p className="text-sm text-gray-600 dark:text-gray-400">{t('outputs.maintenanceMargin')}</p>
-          <p className="font-medium dark:text-white">{formatNumber(results.maintenanceMargin)}</p>
-        </div>
-        
-        <div>
+        <div className="mb-4">
           <p className="text-sm text-gray-600 dark:text-gray-400">{t('outputs.unrealizedPnL')}</p>
           <p className={`font-medium ${getColorClass(results.unrealizedPnL)}`}>
             {formatNumber(results.unrealizedPnL)}
           </p>
+          <div className="mt-2">
+            <label className="inline-flex items-center">
+              <input
+                type="checkbox"
+                name="marginAfterPnl"
+                checked={position.marginAfterPnl || false}
+                onChange={(e) => {
+                  const { checked } = e.target;
+                  updatePosition(positionId, { marginAfterPnl: checked });
+                }}
+                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600"
+              />
+              <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">
+                {t('trading.marginAfterPnl')}
+              </span>
+            </label>
+          </div>
         </div>
         
         <div>
