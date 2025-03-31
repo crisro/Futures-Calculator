@@ -403,8 +403,19 @@ const PositionForm = ({ positionId }) => {
             
             {/* MMR% */}
             <div className="mb-2">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                {t('inputs.mmr')}
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <a 
+                  href="https://www.bitunix.com/contract-trade/BTCUSDT/limits" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="flex items-center hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
+                >
+                  {t('inputs.mmr')}
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z" />
+                    <path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z" />
+                  </svg>
+                </a>
               </label>
               <input
                 type="number"

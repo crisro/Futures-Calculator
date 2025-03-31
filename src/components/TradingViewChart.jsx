@@ -7,7 +7,7 @@ const TradingViewChart = () => {
   const { positions } = useCalculator();
   const containerRef = useRef(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [chartHeight, setChartHeight] = useState(800);
+  const [chartHeight, setChartHeight] = useState(900);
   
   // Get the symbol from the first position (or default to BTC/USDT)
   const symbol = positions.length > 0 ? positions[0].symbol : 'BINANCE:BTCUSDT';
@@ -18,6 +18,8 @@ const TradingViewChart = () => {
       const script = document.createElement('script');
       script.src = 'https://s3.tradingview.com/tv.js';
       script.async = true;
+      const currentContainer = containerRef.current; // Store reference to avoid closure issues
+      
       script.onload = () => {
         if (window.TradingView) {
           new window.TradingView.widget({
@@ -33,8 +35,8 @@ const TradingViewChart = () => {
             allow_symbol_change: true,
             withdateranges: true,
             show_popup_button: true,
-            popup_width: 1000,
-            popup_height: 650,
+            popup_width: 1920,
+            popup_height: 1080,
             hide_side_toolbar: false,
             container_id: 'tradingview_chart'
 
@@ -42,12 +44,12 @@ const TradingViewChart = () => {
         }
       };
       
-      containerRef.current.appendChild(script);
+      currentContainer.appendChild(script);
       
       // Clean up
       return () => {
-        if (containerRef.current && script.parentNode) {
-          containerRef.current.removeChild(script);
+        if (currentContainer && script.parentNode) {
+          currentContainer.removeChild(script);
         }
       };
     }

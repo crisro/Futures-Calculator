@@ -11,12 +11,12 @@ import './App.css';
 function App() {
   const { t } = useTranslation();
   const { positions, addPosition } = useCalculator();
-  const [theme, setTheme] = useState('light');
+  const [theme, setTheme] = useState('dark');
   const [showSettings, setShowSettings] = useState(false);
 
   useEffect(() => {
     // Check for user's preferred theme
-    const savedTheme = localStorage.getItem('theme') || 'light';
+    const savedTheme = localStorage.getItem('theme') || 'dark';
     setTheme(savedTheme);
     document.documentElement.classList.toggle('dark', savedTheme === 'dark');
   }, []);
@@ -32,10 +32,6 @@ function App() {
     setShowSettings(!showSettings);
   };
 
-  const handleAddPosition = () => {
-    addPosition();
-  };
-  
   // Listen for add-position event from PositionForm
   useEffect(() => {
     const addPositionHandler = () => {

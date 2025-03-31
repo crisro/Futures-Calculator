@@ -47,27 +47,22 @@ export const CalculatorProvider = ({ children }) => {
   const [apiSecret, setApiSecret] = useState('');
   const [bitUnixService] = useState(new BitUnixService());
   
-  // Initialize with one position
-  useEffect(() => {
-    if (positions.length === 0) {
-      addPosition();
-    }
-  }, []);
-  
-  // Calculate results whenever positions change
-  useEffect(() => {
-    calculateResults();
-  }, [positions]);
-  
-  // Add a new position
-  const addPosition = () => {
+  // Add a new position - defined with useCallback to prevent recreation on each render
+  const addPosition = React.useCallback(() => {
     const newPosition = {
       ...defaultPosition,
       id: positions.length > 0 ? Math.max(...positions.map(p => p.id)) + 1 : 1,
     };
     
-    setPositions([...positions, newPosition]);
-  };
+    setPositions(prevPositions => [...prevPositions, newPosition]);
+  }, [positions]);
+  
+  // Initialize with one position
+  useEffect(() => {
+    if (positions.length === 0) {
+      addPosition();
+    }
+  }, [positions.length, addPosition]);
   
   // Update a position
   const updatePosition = (id, updates) => {
@@ -86,8 +81,8 @@ export const CalculatorProvider = ({ children }) => {
     setCalculations(newCalculations);
   };
   
-  // Calculate position metrics based on input values
-  const calculatePositionMetrics = (position, crossPositions = []) => {
+  // Calculate position metrics based on input values - wrapped in useCallback to prevent recreation
+  const calculatePositionMetrics = React.useCallback((position, crossPositions = []) => {
     const {
       entryPrice,
       positionSize,
@@ -127,7 +122,7 @@ export const CalculatorProvider = ({ children }) => {
     let availableMargin = initialMargin;
     
     // Apply funding fee to available margin
-    if (position.fundingFee != 0) {
+    if (position.fundingFee !== 0) {
       availableMargin += position.fundingFee;
     }
     
@@ -254,10 +249,10 @@ export const CalculatorProvider = ({ children }) => {
       breakEvenPrice,
       roi
     };
-  };
+  }, []);
   
-  // Calculate all results
-  const calculateResults = () => {
+  // Calculate all results - defined with useCallback to prevent recreation on each render
+  const calculateResults = React.useCallback(() => {
     const newCalculations = {};
     let totalEquity = 0;
     let totalMaintenanceMargin = 0;
@@ -282,7 +277,12 @@ export const CalculatorProvider = ({ children }) => {
     }
     
     setCalculations(newCalculations);
-  };
+  }, [positions, calculatePositionMetrics]);
+  
+  // Calculate results whenever positions change
+  useEffect(() => {
+    calculateResults();
+  }, [calculateResults]);
   
   // Update BitUnix service credentials when API key or secret changes
   useEffect(() => {

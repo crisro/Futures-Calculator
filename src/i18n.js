@@ -29,6 +29,7 @@ i18n
             leverage: 'Leverage',
             mmr: 'Maintenance Margin Requirement (%)',
             vipLevel: 'VIP Level',
+            closePrice: 'Close Price',
             currentPrice: 'Close Price',
             positionType: 'Position Type',
             long: 'Long',
