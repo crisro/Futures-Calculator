@@ -360,7 +360,6 @@ export const CalculatorProvider = ({ children }) => {
       
       // In cross mode, the total available margin is wallet balance + total unrealized PnL
       if (walletBalance !== null) {
-        const prevTotalMargin = totalAvailableMargin;
         totalAvailableMargin = walletBalance + totalUnrealizedPnL;
         
         liquidationCalcSteps.steps.push({

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useCalculator } from '../contexts/CalculatorContext';
+import { Switch } from '@headlessui/react';
 
 const PositionForm = ({ positionId }) => {
   const { t } = useTranslation();
@@ -329,29 +330,24 @@ const PositionForm = ({ positionId }) => {
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 {t('inputs.positionType')}
               </label>
-              <div className="flex space-x-4">
-                <label className="inline-flex items-center">
-                  <input
-                    type="radio"
-                    name="positionType"
-                    value="long"
-                    checked={position.positionType === 'long'}
-                    onChange={handleInputChange}
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600"
+              <div className="flex items-center space-x-4">
+                <Switch
+                  checked={position.positionType === 'long'}
+                  onChange={(checked) => handleInputChange({
+                    target: { name: 'positionType', value: checked ? 'long' : 'short' }
+                  })}
+                  className={`${position.positionType === 'long' ? 'bg-blue-600' : 'bg-red-400'}
+                    relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}
+                >
+                  <span className="sr-only">{t('inputs.positionType')}</span>
+                  <span
+                    className={`${position.positionType === 'long' ? 'translate-x-6' : 'translate-x-1'}
+                      inline-block h-4 w-4 transform rounded-full bg-white transition-transform`}
                   />
-                  <span className="ml-2 text-gray-700 dark:text-gray-300">{t('inputs.long')}</span>
-                </label>
-                <label className="inline-flex items-center">
-                  <input
-                    type="radio"
-                    name="positionType"
-                    value="short"
-                    checked={position.positionType === 'short'}
-                    onChange={handleInputChange}
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600"
-                  />
-                  <span className="ml-2 text-gray-700 dark:text-gray-300">{t('inputs.short')}</span>
-                </label>
+                </Switch>
+                <span className="text-gray-700 dark:text-gray-300">
+                  {position.positionType === 'long' ? t('inputs.long') : t('inputs.short')}
+                </span>
               </div>
             </div>
             
@@ -360,29 +356,24 @@ const PositionForm = ({ positionId }) => {
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 {t('inputs.marginMode')}
               </label>
-              <div className="flex space-x-4">
-                <label className="inline-flex items-center">
-                  <input
-                    type="radio"
-                    name="marginMode"
-                    value="isolated"
-                    checked={position.marginMode === 'isolated'}
-                    onChange={handleInputChange}
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600"
+              <div className="flex items-center space-x-4">
+                <Switch
+                  checked={position.marginMode === 'isolated'}
+                  onChange={(checked) => handleInputChange({
+                    target: { name: 'marginMode', value: checked ? 'isolated' : 'cross' }
+                  })}
+                  className={`${position.marginMode === 'isolated' ? 'bg-blue-600' : 'bg-red-400'}
+                    relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}
+                >
+                  <span className="sr-only">{t('inputs.marginMode')}</span>
+                  <span
+                    className={`${position.marginMode === 'isolated' ? 'translate-x-6' : 'translate-x-1'}
+                      inline-block h-4 w-4 transform rounded-full bg-white transition-transform`}
                   />
-                  <span className="ml-2 text-gray-700 dark:text-gray-300">{t('inputs.isolated')}</span>
-                </label>
-                <label className="inline-flex items-center">
-                  <input
-                    type="radio"
-                    name="marginMode"
-                    value="cross"
-                    checked={position.marginMode === 'cross'}
-                    onChange={handleInputChange}
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600"
-                  />
-                  <span className="ml-2 text-gray-700 dark:text-gray-300">{t('inputs.cross')}</span>
-                </label>
+                </Switch>
+                <span className="text-gray-700 dark:text-gray-300">
+                  {position.marginMode === 'isolated' ? t('inputs.isolated') : t('inputs.cross')}
+                </span>
               </div>
             </div>
             
