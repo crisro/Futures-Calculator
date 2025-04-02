@@ -5,6 +5,7 @@ import PositionForm from './components/PositionForm';
 import ResultsDisplay from './components/ResultsDisplay';
 import TradingViewChart from './components/TradingViewChart';
 import Settings from './components/Settings';
+import WalletBalanceInput from './components/WalletBalanceInput';
 import { useCalculator } from './contexts/CalculatorContext';
 import './App.css';
 
@@ -51,6 +52,9 @@ function App() {
       
       <main className="container mx-auto px-4 py-6">
         {showSettings && <Settings />}
+        
+        {/* Wallet Balance Input - Only shown when there are cross margin positions */}
+        {positions.some(p => p.marginMode === 'cross') && <WalletBalanceInput />}
         
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
           <div className="lg:col-span-2">

@@ -656,7 +656,7 @@ const PositionForm = ({ positionId }) => {
             </div>
             
             {/* Deduct Fee From Margin - Aligned with Manual Margin */}
-            {/* <div className="mb-2 flex items-center">
+             <div className="mb-2 flex items-center">
               <label className="inline-flex items-center">
                 <input
                   type="checkbox"
@@ -672,7 +672,7 @@ const PositionForm = ({ positionId }) => {
             </div>
             
             {/* Deduct Opening Fee - only shown if deductFeeFromMargin is checked */}
-            {/*position.deductFeeFromMargin && (
+            {position.deductFeeFromMargin && (
               <div className="mb-2">
                 <label className="inline-flex items-center">
                   <input

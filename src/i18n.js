@@ -53,7 +53,26 @@ i18n
             totalMaintenanceMargin: 'Total Maintenance Margin',
             crossLiquidationThreshold: 'Cross Liquidation Threshold',
             liquidationWarning: 'Warning: High liquidation risk!',
-            roi: 'ROI'
+            roi: 'ROI',
+            walletBalance: 'Wallet Balance',
+            totalUnrealizedPnL: 'Total PnL',
+            marginRate: 'Margin Rate',
+            highRiskWarning: 'High risk!',
+            marginRateInfo: 'Margin rate measures the risk of a position; the higher the margin rate, the higher the risk. When the margin rate reaches 100%, it will trigger liquidation. It is calculated as the ratio of maintenance margin to available margin.',
+            showLiquidationCalc: 'Show Liquidation Calculation',
+            hideLiquidationCalc: 'Hide Liquidation Calculation',
+            liquidationCalcTitle: 'Liquidation Price Calculation',
+            liquidationCalcFormula: 'Formula:',
+            liquidationCalcStep: 'Step',
+            liquidationCalcDescription: 'Description',
+            liquidationCalcCalculation: 'Calculation',
+            liquidationCalcResult: 'Result'
+          },
+          wallet: {
+            title: 'Wallet Settings',
+            balance: 'Wallet Balance',
+            enterBalance: 'Enter your wallet balance',
+            crossModeInfo: 'In cross mode, all positions share this wallet balance as margin and PnL of each position affects the entire account balance.'
           },
           buttons: {
             addPosition: 'Add Position',
@@ -151,7 +170,26 @@ i18n
             totalMaintenanceMargin: 'کل حاشیه نگهداری',
             crossLiquidationThreshold: 'آستانه لیکویید متقاطع',
             liquidationWarning: 'هشدار: خطر لیکویید بالا!',
-            roi: 'بازده سرمایه‌گذاری'
+            roi: 'بازده سرمایه‌گذاری',
+            walletBalance: 'موجودی کیف پول',
+            totalUnrealizedPnL: 'کل سود/زیان',
+            marginRate: 'نرخ مارجین',
+            highRiskWarning: 'ریسک بالا!',
+            marginRateInfo: 'نرخ مارجین میزان ریسک یک پوزیشن را اندازه‌گیری می‌کند؛ هرچه نرخ مارجین بالاتر باشد، ریسک بالاتر است. وقتی نرخ مارجین به ۱۰۰٪ می‌رسد، لیکویید شدن اتفاق می‌افتد. این نرخ به صورت نسبت مارجین نگهداری به مارجین در دسترس محاسبه می‌شود.',
+            showLiquidationCalc: 'نمایش محاسبه قیمت لیکویید',
+            hideLiquidationCalc: 'پنهان کردن محاسبه قیمت لیکویید',
+            liquidationCalcTitle: 'محاسبه قیمت لیکویید',
+            liquidationCalcFormula: 'فرمول:',
+            liquidationCalcStep: 'مرحله',
+            liquidationCalcDescription: 'توضیحات',
+            liquidationCalcCalculation: 'محاسبه',
+            liquidationCalcResult: 'نتیجه'
+          },
+          wallet: {
+            title: 'تنظیمات کیف پول',
+            balance: 'موجودی کیف پول',
+            enterBalance: 'موجودی کیف پول خود را وارد کنید',
+            crossModeInfo: 'در حالت کراس، تمام پوزیشن‌ها از این موجودی به عنوان مارجین استفاده می‌کنند و سود/زیان هر پوزیشن بر کل موجودی تأثیر می‌گذارد.'
           },
           buttons: {
             addPosition: 'افزودن موقعیت',
