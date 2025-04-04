@@ -6,6 +6,7 @@ const ResultsDisplay = ({ positionId }) => {
   const { t } = useTranslation();
   const { calculations, positions, updatePosition } = useCalculator();
   const [showLiquidationCalc, setShowLiquidationCalc] = useState(false);
+  const [showFeeCalc, setShowFeeCalc] = useState(false);
   
   const position = positions.find(p => p.id === positionId);
   const results = calculations[positionId];
@@ -80,6 +81,41 @@ const ResultsDisplay = ({ positionId }) => {
         </div>
       )}
       
+      {showFeeCalc && results.feeCalcSteps && (
+        <div className="mb-4 p-3 border dark:border-gray-600 rounded-md bg-gray-50 dark:bg-gray-700">
+          <h4 className="font-medium text-md mb-2 dark:text-white">{t('outputs.feeCalcTitle')}</h4>
+          
+          {results.feeCalcSteps.formula && (
+            <div className="mb-3">
+              <p className="text-sm bg-gray-100 dark:bg-gray-800 p-2 rounded font-mono">{results.feeCalcSteps.formula}</p>
+            </div>
+          )}
+          
+          <div className="overflow-x-auto">
+            <table className="min-w-full text-sm">
+              <thead className="bg-gray-100 dark:bg-gray-800">
+                <tr>
+                  <th className="py-2 px-3 text-left">{t('outputs.feeCalcStep')}</th>
+                  <th className="py-2 px-3 text-left">{t('outputs.feeCalcDescription')}</th>
+                  <th className="py-2 px-3 text-left">{t('outputs.feeCalcCalculation')}</th>
+                  <th className="py-2 px-3 text-left">{t('outputs.feeCalcResult')}</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                {results.feeCalcSteps.steps.map((step, index) => (
+                  <tr key={index} className="hover:bg-gray-50 dark:hover:bg-gray-600">
+                    <td className="py-2 px-3">{step.step}</td>
+                    <td className="py-2 px-3">{step.description}</td>
+                    <td className="py-2 px-3 font-mono">{step.calculation}</td>
+                    <td className="py-2 px-3">{step.result !== null ? formatNumber(step.result) : '-'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+      
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <div>
           <p className="text-sm text-gray-600 dark:text-gray-400">{t('outputs.availableMargin')}</p>
@@ -97,7 +133,15 @@ const ResultsDisplay = ({ positionId }) => {
         </div>
         
         <div>
-          <p className="text-sm text-gray-600 dark:text-gray-400">{t('outputs.tradingFees')}</p>
+          <div className="flex justify-between items-center">
+            <p className="text-sm text-gray-600 dark:text-gray-400">{t('outputs.tradingFees')}</p>
+            <button 
+              onClick={() => setShowFeeCalc(!showFeeCalc)}
+              className="text-xs px-2 py-0.5 bg-blue-500 hover:bg-blue-600 text-white rounded-md transition-colors"
+            >
+              {showFeeCalc ? t('outputs.hideFeeCalc') : t('outputs.showFeeCalc')}
+            </button>
+          </div>
           <p className="font-medium dark:text-white">{formatNumber(results.tradingFees)}</p>
         </div>
         

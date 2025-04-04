@@ -116,13 +116,49 @@ export const CalculatorProvider = ({ children }) => {
     // Funding fee is no longer included in initial margin calculation
     // It will only affect available margin and other derived calculations
     
+    // Create an object to store the step-by-step fee calculation details
+    const feeCalcSteps = {
+      steps: [],
+      formula: '',
+      variables: {}
+    };
+    
+    // Store variables for the fee calculation steps
+    feeCalcSteps.variables = {
+      entryPrice,
+      currentPrice,
+      positionSize,
+      vipLevel,
+      orderType: position.orderType,
+      closeOrderType: position.closeOrderType,
+      fundingFee: position.fundingFee
+    };
+    
     // Calculate opening transaction fees based on order type (maker/taker)
     const openFeeRate = position.orderType === 'maker' ? feeRates.maker : feeRates.taker;
     const openingTransactionFees = (entryPrice * positionSize) * (openFeeRate / 100);
     
+    // Add step for opening fee calculation
+    feeCalcSteps.steps.push({
+      step: 1,
+      description: 'Calculate opening transaction fees',
+      calculation: `opening fee = avrage entery price * size * fee rate = (${entryPrice} * ${positionSize}) * (${openFeeRate} / 100) = ${openingTransactionFees.toFixed(4)}`,
+      result: openingTransactionFees
+    });
+    
     // Calculate closing transaction fees based on close order type (maker/taker)
     const closeFeeRate = position.closeOrderType === 'maker' ? feeRates.maker : feeRates.taker;
     const closingTransactionFees = (currentPrice * positionSize) * (closeFeeRate / 100);
+    
+    // Add step for closing fee calculation
+    feeCalcSteps.steps.push({
+      step: 2,
+      description: 'Calculate closing transaction fees',
+      calculation: `closing fee = avrage closing price * size * fee rate = (${currentPrice} * ${positionSize}) * (${closeFeeRate} / 100) = ${closingTransactionFees.toFixed(4)}`,
+      result: closingTransactionFees
+    });
+    
+    // Funding fee step removed as per requirements
     
     // Calculate available margin based on fee deduction options and margin mode
     let availableMargin;
@@ -134,18 +170,34 @@ export const CalculatorProvider = ({ children }) => {
       availableMargin = initialMargin;
     }
     
-    // Apply funding fee to available margin
-    if (position.fundingFee !== 0) {
-      availableMargin += position.fundingFee;
-    }
+    // Initial available margin step removed as per requirements
+    let stepCounter = 7;
+    
+    // We're not applying funding fee to available margin as per requirements
     
     // If deducting fees from margin, adjust the available margin
     if (position.deductFeeFromMargin) {
       if (position.deductOpenFee) {
+        const prevMargin = availableMargin;
         availableMargin -= openingTransactionFees;
+        
+        feeCalcSteps.steps.push({
+          step: stepCounter++,
+          description: 'Deduct opening fees from margin',
+          calculation: `${prevMargin.toFixed(4)} - ${openingTransactionFees.toFixed(4)} = ${availableMargin.toFixed(4)}`,
+          result: availableMargin
+        });
       }
       if (position.deductCloseFee) {
+        const prevMargin = availableMargin;
         availableMargin -= closingTransactionFees;
+        
+        feeCalcSteps.steps.push({
+          step: stepCounter++,
+          description: 'Deduct closing fees from margin',
+          calculation: `${prevMargin.toFixed(4)} - ${closingTransactionFees.toFixed(4)} = ${availableMargin.toFixed(4)}`,
+          result: availableMargin
+        });
       }
     }
     
@@ -153,12 +205,33 @@ export const CalculatorProvider = ({ children }) => {
     let breakEvenPrice;
     // Calculate total fees including opening and closing fees
     const totalFees = openingTransactionFees + closingTransactionFees - position.fundingFee;
+    
+    // Add step for total fees calculation
+    feeCalcSteps.steps.push({
+      step: 4,
+      description: 'Calculate total fees',
+      calculation: `Trasnction fee = opening fee + closing fee = ${openingTransactionFees.toFixed(4)} + ${closingTransactionFees.toFixed(4)} = ${(openingTransactionFees + closingTransactionFees).toFixed(4)}`,
+      result: openingTransactionFees + closingTransactionFees
+    });
+    
     const feesPerUnit = totalFees / positionSize;
     
+    // Fees per unit calculation step removed as per requirements
+    
+    // Only calculate break-even price for short positions as per requirements
     if (positionType === 'long') {
       breakEvenPrice = entryPrice + feesPerUnit;
     } else { // short
       breakEvenPrice = entryPrice - feesPerUnit;
+      
+      // Add step for break-even price calculation (short)
+      feeCalcSteps.formula = 'Entry Price - Fees Per Unit';
+      feeCalcSteps.steps.push({
+        step: 6,
+        description: 'Calculate break-even price (short position)',
+        calculation: `${entryPrice} - ${feesPerUnit.toFixed(4)} = ${breakEvenPrice.toFixed(4)}`,
+        result: breakEvenPrice
+      });
     }
     
     // Calculate cost value based on fee deduction options
@@ -458,6 +531,19 @@ export const CalculatorProvider = ({ children }) => {
       marginRate = 100;
     }
     
+    // Filter out the specified calculation steps before returning
+    const filteredFeeCalcSteps = {
+      ...feeCalcSteps,
+      steps: feeCalcSteps.steps.filter(step => {
+        // Filter out steps related to fees per unit, initial available margin, and funding fee
+        return !(
+          step.description.includes('Calculate fees per unit') ||
+          step.description.includes('Set initial available margin') ||
+          step.description.includes('Apply funding fee')
+        );
+      })
+    };
+    
     return {
       availableMargin,
       costValue,
@@ -470,7 +556,8 @@ export const CalculatorProvider = ({ children }) => {
       breakEvenPrice,
       roi,
       marginRate,
-      liquidationCalcSteps // Include the step-by-step calculation details
+      liquidationCalcSteps, // Include the step-by-step liquidation calculation details
+      feeCalcSteps: filteredFeeCalcSteps // Include the filtered step-by-step fee calculation details
     };
   }, []);
   

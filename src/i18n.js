@@ -66,7 +66,15 @@ i18n
             liquidationCalcStep: 'Step',
             liquidationCalcDescription: 'Description',
             liquidationCalcCalculation: 'Calculation',
-            liquidationCalcResult: 'Result'
+            liquidationCalcResult: 'Result',
+            showFeeCalc: 'Show Fee Calculation',
+            hideFeeCalc: 'Hide Fee Calculation',
+            feeCalcTitle: 'Trading Fee Calculation',
+            feeCalcFormula: '',
+            feeCalcStep: 'Step',
+            feeCalcDescription: 'Description',
+            feeCalcCalculation: 'Calculation',
+            feeCalcResult: 'Result'
           },
           wallet: {
             title: 'Wallet Settings',
@@ -183,7 +191,15 @@ i18n
             liquidationCalcStep: 'مرحله',
             liquidationCalcDescription: 'توضیحات',
             liquidationCalcCalculation: 'محاسبه',
-            liquidationCalcResult: 'نتیجه'
+            liquidationCalcResult: 'نتیجه',
+            showFeeCalc: 'نمایش محاسبه کارمزد',
+            hideFeeCalc: 'پنهان کردن محاسبه کارمزد',
+            feeCalcTitle: 'محاسبه کارمزد معامله',
+            feeCalcFormula: '',
+            feeCalcStep: 'مرحله',
+            feeCalcDescription: 'توضیحات',
+            feeCalcCalculation: 'محاسبه',
+            feeCalcResult: 'نتیجه'
           },
           wallet: {
             title: 'تنظیمات کیف پول',
