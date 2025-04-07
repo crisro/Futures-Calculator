@@ -7,6 +7,7 @@ const ResultsDisplay = ({ positionId }) => {
   const { calculations, positions, updatePosition } = useCalculator();
   const [showLiquidationCalc, setShowLiquidationCalc] = useState(false);
   const [showFeeCalc, setShowFeeCalc] = useState(false);
+  const [showPnlCalc, setShowPnlCalc] = useState(false);
   
   const position = positions.find(p => p.id === positionId);
   const results = calculations[positionId];
@@ -116,6 +117,41 @@ const ResultsDisplay = ({ positionId }) => {
         </div>
       )}
       
+      {showPnlCalc && results.pnlCalcSteps && (
+        <div className="mb-4 p-3 border dark:border-gray-600 rounded-md bg-gray-50 dark:bg-gray-700">
+          <h4 className="font-medium text-md mb-2 dark:text-white">{t('outputs.pnlCalcTitle')}</h4>
+          
+          {results.pnlCalcSteps.formula && (
+            <div className="mb-3">
+              <p className="text-sm bg-gray-100 dark:bg-gray-800 p-2 rounded font-mono">{results.pnlCalcSteps.formula}</p>
+            </div>
+          )}
+          
+          <div className="overflow-x-auto">
+            <table className="min-w-full text-sm">
+              <thead className="bg-gray-100 dark:bg-gray-800">
+                <tr>
+                  <th className="py-2 px-3 text-left">{t('outputs.pnlCalcStep')}</th>
+                  <th className="py-2 px-3 text-left">{t('outputs.pnlCalcDescription')}</th>
+                  <th className="py-2 px-3 text-left">{t('outputs.pnlCalcCalculation')}</th>
+                  <th className="py-2 px-3 text-left">{t('outputs.pnlCalcResult')}</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                {results.pnlCalcSteps.steps.map((step, index) => (
+                  <tr key={index} className="hover:bg-gray-50 dark:hover:bg-gray-600">
+                    <td className="py-2 px-3">{step.step}</td>
+                    <td className="py-2 px-3">{step.description}</td>
+                    <td className="py-2 px-3 font-mono">{step.calculation}</td>
+                    <td className="py-2 px-3">{step.result !== null ? formatNumber(step.result) : '-'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+      
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <div>
           <p className="text-sm text-gray-600 dark:text-gray-400">{t('outputs.availableMargin')}</p>
@@ -151,7 +187,15 @@ const ResultsDisplay = ({ positionId }) => {
         </div>
         
         <div className="mb-4">
-          <p className="text-sm text-gray-600 dark:text-gray-400">{t('outputs.unrealizedPnL')}</p>
+          <div className="flex justify-between items-center">
+            <p className="text-sm text-gray-600 dark:text-gray-400">{t('outputs.unrealizedPnL')}</p>
+            <button 
+              onClick={() => setShowPnlCalc(!showPnlCalc)}
+              className="text-xs px-2 py-0.5 bg-blue-500 hover:bg-blue-600 text-white rounded-md transition-colors"
+            >
+              {showPnlCalc ? t('outputs.hidePnlCalc') : t('outputs.showPnlCalc')}
+            </button>
+          </div>
           <p className={`font-medium ${getColorClass(results.unrealizedPnL)}`}>
             {formatNumber(results.unrealizedPnL)}
           </p>

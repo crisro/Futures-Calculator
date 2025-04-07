@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useCalculator } from '../contexts/CalculatorContext';
+import BitUnixChart from './BitUnixChart';
 
 const TradingViewChart = () => {
   const { t } = useTranslation();
@@ -8,6 +9,7 @@ const TradingViewChart = () => {
   const containerRef = useRef(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [chartHeight, setChartHeight] = useState(900);
+  const [chartProvider, setChartProvider] = useState('tradingview'); // 'tradingview' or 'bitunix'
   
   // Get the symbol from the first position (or default to BTC/USDT)
   const symbol = positions.length > 0 ? positions[0].symbol : 'BINANCE:BTCUSDT';
@@ -58,6 +60,10 @@ const TradingViewChart = () => {
   const toggleFullscreen = () => {
     setIsFullscreen(!isFullscreen);
   };
+  
+  const toggleChartProvider = () => {
+    setChartProvider(chartProvider === 'tradingview' ? 'bitunix' : 'tradingview');
+  };
 
   const increaseChartSize = () => {
     setChartHeight(chartHeight + 100);
@@ -72,9 +78,18 @@ const TradingViewChart = () => {
   return (
     <div className={`bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md border dark:border-gray-700 ${isFullscreen ? 'fixed inset-0 z-50 overflow-auto' : 'h-full'}`}>
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold dark:text-white">
-          {t('chart.title')}
-        </h2>
+        <div className="flex items-center">
+          <h2 className="text-xl font-semibold dark:text-white mr-4">
+            {t('chart.title')}
+          </h2>
+          <button
+            onClick={toggleChartProvider}
+            className="px-3 py-1 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors mr-2"
+            title={chartProvider === 'tradingview' ? 'Switch to Bitunix Chart' : 'Switch to TradingView Chart'}
+          >
+            {chartProvider === 'tradingview' ? 'Bitunix' : 'TradingView'}
+          </button>
+        </div>
         <div className="flex space-x-2">
           <button 
             onClick={decreaseChartSize}
@@ -112,12 +127,16 @@ const TradingViewChart = () => {
           </button>
         </div>
       </div>
-      <div 
-        id="tradingview_chart" 
-        className={`w-full`}
-        style={{ height: `${chartHeight}px` }} 
-        ref={containerRef}
-      />
+      {chartProvider === 'tradingview' ? (
+        <div 
+          id="tradingview_chart" 
+          className={`w-full`}
+          style={{ height: `${chartHeight}px` }} 
+          ref={containerRef}
+        />
+      ) : (
+        <BitUnixChart height={chartHeight} />
+      )}
     </div>
   );
 };

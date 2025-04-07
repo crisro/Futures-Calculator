@@ -254,10 +254,83 @@ export const CalculatorProvider = ({ children }) => {
     
     // Recalculate unrealized PnL
     let unrealizedPnL;
+    
+    // Create an object to store the step-by-step PNL calculation details
+    const pnlCalcSteps = {
+      steps: [],
+      formula: '',
+      variables: {}
+    };
+    
+    // Store variables for the PNL calculation steps
+    pnlCalcSteps.variables = {
+      entryPrice,
+      currentPrice,
+      positionSize,
+      positionType,
+      totalFees
+    };
+    
     if (positionType === 'long') {
-      unrealizedPnL = (currentPrice - entryPrice) * positionSize - totalFees;
+      // For long positions
+      pnlCalcSteps.formula = 'PNL = (Current Price - Entry Price) * Position Size - Total Fees';
+      
+      // Step 1: Calculate price difference
+      const priceDiff = currentPrice - entryPrice;
+      pnlCalcSteps.steps.push({
+        step: 1,
+        description: 'Calculate price difference',
+        calculation: `${currentPrice} - ${entryPrice} = ${priceDiff.toFixed(4)}`,
+        result: priceDiff
+      });
+      
+      // Step 2: Multiply by position size
+      const rawPnl = priceDiff * positionSize;
+      pnlCalcSteps.steps.push({
+        step: 2,
+        description: 'Multiply price difference by position size',
+        calculation: `${priceDiff.toFixed(4)} * ${positionSize} = ${rawPnl.toFixed(4)}`,
+        result: rawPnl
+      });
+      
+      // Step 3: Subtract total fees
+      unrealizedPnL = rawPnl - totalFees;
+      pnlCalcSteps.steps.push({
+        step: 3,
+        description: 'Subtract total fees',
+        calculation: `${rawPnl.toFixed(4)} - ${totalFees.toFixed(4)} = ${unrealizedPnL.toFixed(4)}`,
+        result: unrealizedPnL
+      });
     } else { // short
-      unrealizedPnL = (entryPrice - currentPrice) * positionSize - totalFees;
+      // For short positions
+      pnlCalcSteps.formula = 'PNL = (Entry Price - Current Price) * Position Size - Total Fees';
+      
+      // Step 1: Calculate price difference
+      const priceDiff = entryPrice - currentPrice;
+      pnlCalcSteps.steps.push({
+        step: 1,
+        description: 'Calculate price difference',
+        calculation: `${entryPrice} - ${currentPrice} = ${priceDiff.toFixed(4)}`,
+        result: priceDiff
+      });
+      
+      // Step 2: Multiply by position size
+      const rawPnl = priceDiff * positionSize;
+      pnlCalcSteps.steps.push({
+        step: 2,
+        description: 'Multiply price difference by position size',
+        calculation: `${priceDiff.toFixed(4)} * ${positionSize} = ${rawPnl.toFixed(4)}`,
+        result: rawPnl
+      });
+      
+      // Step 3: Subtract total fees
+      unrealizedPnL = rawPnl - totalFees;
+      pnlCalcSteps.steps.push({
+        step: 3,
+        description: 'Subtract total fees',
+        calculation: `${rawPnl.toFixed(4)} - ${totalFees.toFixed(4)} = ${unrealizedPnL.toFixed(4)}`,
+        result: unrealizedPnL
+      });
     }
     
     // Calculate liquidation price based on margin mode
@@ -366,7 +439,8 @@ export const CalculatorProvider = ({ children }) => {
         });
       }
     } else { // cross margin
-      // For cross margin, consider all positions' margins and PnLs
+      // For cross margin, use isolated margin formula but with Total Available Margin
+      // Calculate total available margin from wallet balance and unrealized PnL
       let totalAvailableMargin = walletBalance !== null ? walletBalance : availableMargin;
       let totalMaintenanceMargin = maintenanceMargin;
       let totalUnrealizedPnL = unrealizedPnL;
@@ -443,43 +517,101 @@ export const CalculatorProvider = ({ children }) => {
         });
       }
       
-      // Calculate cross margin liquidation price
+      // Use isolated margin formula but with Total Available Margin instead of Available Margin
+      const maintenanceMarginRate = mmr / 100;
+      const maintenanceMarginPerUnit = maintenanceMarginRate * entryPrice;
+      const marginPerUnit = totalAvailableMargin / positionSize;
+      
+      liquidationCalcSteps.steps.push({
+        step: stepCounter++,
+        description: 'Calculate maintenance margin per unit',
+        calculation: `${maintenanceMarginRate} * ${entryPrice} = ${maintenanceMarginPerUnit.toFixed(4)}`,
+        result: maintenanceMarginPerUnit
+      });
+      
+      liquidationCalcSteps.steps.push({
+        step: stepCounter++,
+        description: 'Calculate total available margin per unit',
+        calculation: `${totalAvailableMargin.toFixed(4)} / ${positionSize} = ${marginPerUnit.toFixed(4)}`,
+        result: marginPerUnit
+      });
+      
       if (positionType === 'long') {
-        // How much price drop would cause liquidation
-        const priceDrop = (totalAvailableMargin - totalMaintenanceMargin) / positionSize;
-        liquidationPrice = entryPrice - priceDrop;
+        // For long positions - using isolated formula with total available margin
+        liquidationCalcSteps.formula = 'Entry Price - ((Total Available Margin - Position Size * MMR * Entry Price) / Position Size)';
         
-        liquidationCalcSteps.formula = 'Entry Price - ((Total Available Margin - Total Maintenance Margin) / Position Size)';
+        // Step 1: Calculate maintenance margin
+        const maintMargin = positionSize * maintenanceMarginRate * entryPrice;
         liquidationCalcSteps.steps.push({
           step: stepCounter++,
-          description: 'Calculate price drop that would cause liquidation',
-          calculation: `(${totalAvailableMargin.toFixed(4)} - ${totalMaintenanceMargin.toFixed(4)}) / ${positionSize} = ${priceDrop.toFixed(4)}`,
-          result: priceDrop
+          description: 'Calculate maintenance margin',
+          calculation: `${positionSize} * ${maintenanceMarginRate} * ${entryPrice} = ${maintMargin.toFixed(4)}`,
+          result: maintMargin
         });
         
+        // Step 2: Calculate total available margin minus maintenance margin
+        const marginDiff = totalAvailableMargin - maintMargin;
+        liquidationCalcSteps.steps.push({
+          step: stepCounter++,
+          description: 'Calculate total available margin minus maintenance margin',
+          calculation: `${totalAvailableMargin.toFixed(4)} - ${maintMargin.toFixed(4)} = ${marginDiff.toFixed(4)}`,
+          result: marginDiff
+        });
+        
+        // Step 3: Calculate margin per unit of position size
+        const marginPerUnitCalc = marginDiff / positionSize;
+        liquidationCalcSteps.steps.push({
+          step: stepCounter++,
+          description: 'Calculate margin per unit of position size',
+          calculation: `${marginDiff.toFixed(4)} / ${positionSize} = ${marginPerUnitCalc.toFixed(4)}`,
+          result: marginPerUnitCalc
+        });
+        
+        // Step 4: Calculate liquidation price
+        liquidationPrice = entryPrice - marginPerUnitCalc;
         liquidationCalcSteps.steps.push({
           step: stepCounter++,
           description: 'Calculate liquidation price',
-          calculation: `${entryPrice} - ${priceDrop.toFixed(4)} = ${liquidationPrice.toFixed(4)}`,
+          calculation: `${entryPrice} - ${marginPerUnitCalc.toFixed(4)} = ${liquidationPrice.toFixed(4)}`,
           result: liquidationPrice
         });
       } else { // short
-        // How much price increase would cause liquidation
-        const priceIncrease = (totalAvailableMargin - totalMaintenanceMargin) / positionSize;
-        liquidationPrice = entryPrice + priceIncrease;
+        // For short positions - using isolated formula with total available margin
+        liquidationCalcSteps.formula = 'Entry Price + ((Total Available Margin - Position Size * MMR * Entry Price) / Position Size)';
         
-        liquidationCalcSteps.formula = 'Entry Price + ((Total Available Margin - Total Maintenance Margin) / Position Size)';
+        // Step 1: Calculate maintenance margin
+        const maintMargin = positionSize * maintenanceMarginRate * entryPrice;
         liquidationCalcSteps.steps.push({
           step: stepCounter++,
-          description: 'Calculate price increase that would cause liquidation',
-          calculation: `(${totalAvailableMargin.toFixed(4)} - ${totalMaintenanceMargin.toFixed(4)}) / ${positionSize} = ${priceIncrease.toFixed(4)}`,
-          result: priceIncrease
+          description: 'Calculate maintenance margin',
+          calculation: `${positionSize} * ${maintenanceMarginRate} * ${entryPrice} = ${maintMargin.toFixed(4)}`,
+          result: maintMargin
         });
         
+        // Step 2: Calculate total available margin minus maintenance margin
+        const marginDiff = totalAvailableMargin - maintMargin;
+        liquidationCalcSteps.steps.push({
+          step: stepCounter++,
+          description: 'Calculate total available margin minus maintenance margin',
+          calculation: `${totalAvailableMargin.toFixed(4)} - ${maintMargin.toFixed(4)} = ${marginDiff.toFixed(4)}`,
+          result: marginDiff
+        });
+        
+        // Step 3: Calculate margin per unit of position size
+        const marginPerUnitCalc = marginDiff / positionSize;
+        liquidationCalcSteps.steps.push({
+          step: stepCounter++,
+          description: 'Calculate margin per unit of position size',
+          calculation: `${marginDiff.toFixed(4)} / ${positionSize} = ${marginPerUnitCalc.toFixed(4)}`,
+          result: marginPerUnitCalc
+        });
+        
+        // Step 4: Calculate liquidation price
+        liquidationPrice = entryPrice + marginPerUnitCalc;
         liquidationCalcSteps.steps.push({
           step: stepCounter++,
           description: 'Calculate liquidation price',
-          calculation: `${entryPrice} + ${priceIncrease.toFixed(4)} = ${liquidationPrice.toFixed(4)}`,
+          calculation: `${entryPrice} + ${marginPerUnitCalc.toFixed(4)} = ${liquidationPrice.toFixed(4)}`,
           result: liquidationPrice
         });
       }
@@ -557,7 +689,8 @@ export const CalculatorProvider = ({ children }) => {
       roi,
       marginRate,
       liquidationCalcSteps, // Include the step-by-step liquidation calculation details
-      feeCalcSteps: filteredFeeCalcSteps // Include the filtered step-by-step fee calculation details
+      feeCalcSteps: filteredFeeCalcSteps, // Include the filtered step-by-step fee calculation details
+      pnlCalcSteps // Include the step-by-step PNL calculation details
     };
   }, []);
   

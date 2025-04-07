@@ -70,11 +70,19 @@ i18n
             showFeeCalc: 'Show Fee Calculation',
             hideFeeCalc: 'Hide Fee Calculation',
             feeCalcTitle: 'Trading Fee Calculation',
-            feeCalcFormula: '',
+            feeCalcFormula: 'Opening Fee = Quantity of the position * Entry price * Taker or Maker fee rate\nClosing Fee = Quantity of the position * Closing price * Taker or Maker Fee rate',
             feeCalcStep: 'Step',
             feeCalcDescription: 'Description',
             feeCalcCalculation: 'Calculation',
-            feeCalcResult: 'Result'
+            feeCalcResult: 'Result',
+            showPnlCalc: 'Show PNL Calculation',
+            hidePnlCalc: 'Hide PNL Calculation',
+            pnlCalcTitle: 'PNL Calculation',
+            pnlCalcFormula: '',
+            pnlCalcStep: 'Step',
+            pnlCalcDescription: 'Description',
+            pnlCalcCalculation: 'Calculation',
+            pnlCalcResult: 'Result'
           },
           wallet: {
             title: 'Wallet Settings',
@@ -195,11 +203,19 @@ i18n
             showFeeCalc: 'نمایش محاسبه کارمزد',
             hideFeeCalc: 'پنهان کردن محاسبه کارمزد',
             feeCalcTitle: 'محاسبه کارمزد معامله',
-            feeCalcFormula: '',
+            feeCalcFormula: 'کارمزد باز کردن = مقدار پوزیشن * قیمت ورود * نرخ کارمزد میکر یا تیکر\nکارمزد بستن = مقدار پوزیشن * قیمت بستن * نرخ کارمزد میکر یا تیکر',
             feeCalcStep: 'مرحله',
             feeCalcDescription: 'توضیحات',
             feeCalcCalculation: 'محاسبه',
-            feeCalcResult: 'نتیجه'
+            feeCalcResult: 'نتیجه',
+            showPnlCalc: 'نمایش محاسبه سود/زیان',
+            hidePnlCalc: 'پنهان کردن محاسبه سود/زیان',
+            pnlCalcTitle: 'محاسبه سود/زیان',
+            pnlCalcFormula: '',
+            pnlCalcStep: 'مرحله',
+            pnlCalcDescription: 'توضیحات',
+            pnlCalcCalculation: 'محاسبه',
+            pnlCalcResult: 'نتیجه'
           },
           wallet: {
             title: 'تنظیمات کیف پول',
