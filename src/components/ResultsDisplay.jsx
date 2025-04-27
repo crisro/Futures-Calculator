@@ -38,12 +38,26 @@ const ResultsDisplay = ({ positionId }) => {
             {formatNumber(results.liquidationPrice)}
           </span>
         </h3>
-        <button 
-          onClick={() => setShowLiquidationCalc(!showLiquidationCalc)}
-          className="text-sm px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded-md transition-colors"
-        >
-          {showLiquidationCalc ? t('outputs.hideLiquidationCalc') : t('outputs.showLiquidationCalc')}
-        </button>
+        <div className="flex space-x-2">
+          <div className="flex items-center">
+            <input
+              type="checkbox"
+              id={`includeLiquidationFee-${positionId}`}
+              checked={position.includeLiquidationFee}
+              onChange={(e) => updatePosition(positionId, { includeLiquidationFee: e.target.checked })}
+              className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+            />
+            <label htmlFor={`includeLiquidationFee-${positionId}`} className="text-sm text-gray-700 dark:text-gray-300">
+              {t('outputs.includeLiquidationFee', 'Include Liquidation Fee')}
+            </label>
+          </div>
+          <button 
+            onClick={() => setShowLiquidationCalc(!showLiquidationCalc)}
+            className="text-sm px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded-md transition-colors"
+          >
+            {showLiquidationCalc ? t('outputs.hideLiquidationCalc') : t('outputs.showLiquidationCalc')}
+          </button>
+        </div>
       </div>
       
       {showLiquidationCalc && results.liquidationCalcSteps && (

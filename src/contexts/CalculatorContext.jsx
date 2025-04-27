@@ -38,6 +38,7 @@ const defaultPosition = {
   deductCloseFee: false, // کم کردن کارمزد بستن معامله
   closeOrderType: 'taker', // میکر یا تیکر بودن کارمزد بستن معامله
   marginAfterPnl: false, // اضافه کردن مارجین بعد از محاسبه سود/زیان
+  includeLiquidationFee: false, // Include liquidation fee in liquidation price calculation
 };
 
 // Default wallet settings
@@ -342,6 +343,22 @@ export const CalculatorProvider = ({ children }) => {
       variables: {}
     };
     
+    // Calculate liquidation fee if enabled
+    let liquidationFee = 0;
+    if (position.includeLiquidationFee) {
+      // Liquidation fee is 0.025% * exit price * size
+      // For liquidation calculation, we use the liquidation price as the exit price
+      // Since we don't know the liquidation price yet, we'll use a two-step approach
+      // First calculate without fee, then adjust with fee
+      const liquidationFeeRate = 0.00025; // 0.025%
+      liquidationCalcSteps.steps.push({
+        step: liquidationCalcSteps.steps.length + 1,
+        description: 'Note: Including liquidation fee in calculation',
+        calculation: `Liquidation fee rate: ${liquidationFeeRate * 100}% (0.025%)`,
+        result: null
+      });
+    }
+    
     if (marginMode === 'isolated') {
       // Isolated margin liquidation price calculation
       const maintenanceMarginRate = mmr / 100;
@@ -390,14 +407,64 @@ export const CalculatorProvider = ({ children }) => {
           result: marginPerUnitCalc
         });
         
-        // Step 4: Calculate liquidation price
+        // Step 4: Calculate liquidation price (without fee initially)
         liquidationPrice = entryPrice - marginPerUnitCalc;
         liquidationCalcSteps.steps.push({
           step: 4,
-          description: 'Calculate liquidation price',
+          description: 'Calculate initial liquidation price',
           calculation: `${entryPrice} - ${marginPerUnitCalc.toFixed(4)} = ${liquidationPrice.toFixed(4)}`,
           result: liquidationPrice
         });
+        
+        // Step 5: Adjust liquidation price if liquidation fee is enabled
+        if (position.includeLiquidationFee) {
+          const liquidationFeeRate = 0.00025; // 0.025%
+          const initialLiqPrice = liquidationPrice;
+          
+          // For long positions, liquidation fee reduces the liquidation price
+          // Liquidation fee = liquidation fee rate * liquidation price * position size
+          // This fee effectively reduces available margin, so liquidation happens earlier
+          
+          // Calculate liquidation fee based on initial liquidation price
+          liquidationFee = liquidationFeeRate * initialLiqPrice * positionSize;
+          
+          // Recalculate margin difference with fee included
+          const adjustedMarginDiff = availableMargin - maintMargin - liquidationFee;
+          
+          // Recalculate margin per unit
+          const adjustedMarginPerUnit = adjustedMarginDiff / positionSize;
+          
+          // Recalculate liquidation price
+          liquidationPrice = entryPrice - adjustedMarginPerUnit;
+          
+          liquidationCalcSteps.steps.push({
+            step: 5,
+            description: 'Calculate liquidation fee',
+            calculation: `${liquidationFeeRate} * ${initialLiqPrice.toFixed(4)} * ${positionSize} = ${liquidationFee.toFixed(4)}`,
+            result: liquidationFee
+          });
+          
+          liquidationCalcSteps.steps.push({
+            step: 6,
+            description: 'Adjust margin difference with liquidation fee',
+            calculation: `${availableMargin.toFixed(4)} - ${maintMargin.toFixed(4)} - ${liquidationFee.toFixed(4)} = ${adjustedMarginDiff.toFixed(4)}`,
+            result: adjustedMarginDiff
+          });
+          
+          liquidationCalcSteps.steps.push({
+            step: 7,
+            description: 'Recalculate margin per unit',
+            calculation: `${adjustedMarginDiff.toFixed(4)} / ${positionSize} = ${adjustedMarginPerUnit.toFixed(4)}`,
+            result: adjustedMarginPerUnit
+          });
+          
+          liquidationCalcSteps.steps.push({
+            step: 8,
+            description: 'Calculate final liquidation price with fee',
+            calculation: `${entryPrice} - ${adjustedMarginPerUnit.toFixed(4)} = ${liquidationPrice.toFixed(4)}`,
+            result: liquidationPrice
+          });
+        }
       } else { // short
         // For short positions
         liquidationCalcSteps.formula = 'Entry Price + ((Available Margin - Position Size * MMR * Entry Price) / Position Size)';
@@ -429,14 +496,64 @@ export const CalculatorProvider = ({ children }) => {
           result: marginPerUnitCalc
         });
         
-        // Step 4: Calculate liquidation price
+        // Step 4: Calculate liquidation price (without fee initially)
         liquidationPrice = entryPrice + marginPerUnitCalc;
         liquidationCalcSteps.steps.push({
           step: 4,
-          description: 'Calculate liquidation price',
+          description: 'Calculate initial liquidation price',
           calculation: `${entryPrice} + ${marginPerUnitCalc.toFixed(4)} = ${liquidationPrice.toFixed(4)}`,
           result: liquidationPrice
         });
+        
+        // Step 5: Adjust liquidation price if liquidation fee is enabled
+        if (position.includeLiquidationFee) {
+          const liquidationFeeRate = 0.00025; // 0.025%
+          const initialLiqPrice = liquidationPrice;
+          
+          // For short positions, liquidation fee increases the liquidation price
+          // Liquidation fee = liquidation fee rate * liquidation price * position size
+          // This fee effectively reduces available margin, so liquidation happens earlier
+          
+          // Calculate liquidation fee based on initial liquidation price
+          liquidationFee = liquidationFeeRate * initialLiqPrice * positionSize;
+          
+          // Recalculate margin difference with fee included
+          const adjustedMarginDiff = availableMargin - maintMargin - liquidationFee;
+          
+          // Recalculate margin per unit
+          const adjustedMarginPerUnit = adjustedMarginDiff / positionSize;
+          
+          // Recalculate liquidation price
+          liquidationPrice = entryPrice + adjustedMarginPerUnit;
+          
+          liquidationCalcSteps.steps.push({
+            step: 5,
+            description: 'Calculate liquidation fee',
+            calculation: `${liquidationFeeRate} * ${initialLiqPrice.toFixed(4)} * ${positionSize} = ${liquidationFee.toFixed(4)}`,
+            result: liquidationFee
+          });
+          
+          liquidationCalcSteps.steps.push({
+            step: 6,
+            description: 'Adjust margin difference with liquidation fee',
+            calculation: `${availableMargin.toFixed(4)} - ${maintMargin.toFixed(4)} - ${liquidationFee.toFixed(4)} = ${adjustedMarginDiff.toFixed(4)}`,
+            result: adjustedMarginDiff
+          });
+          
+          liquidationCalcSteps.steps.push({
+            step: 7,
+            description: 'Recalculate margin per unit',
+            calculation: `${adjustedMarginDiff.toFixed(4)} / ${positionSize} = ${adjustedMarginPerUnit.toFixed(4)}`,
+            result: adjustedMarginPerUnit
+          });
+          
+          liquidationCalcSteps.steps.push({
+            step: 8,
+            description: 'Calculate final liquidation price with fee',
+            calculation: `${entryPrice} + ${adjustedMarginPerUnit.toFixed(4)} = ${liquidationPrice.toFixed(4)}`,
+            result: liquidationPrice
+          });
+        }
       }
     } else { // cross margin
       // For cross margin, use isolated margin formula but with Total Available Margin
@@ -567,14 +684,64 @@ export const CalculatorProvider = ({ children }) => {
           result: marginPerUnitCalc
         });
         
-        // Step 4: Calculate liquidation price
+        // Step 4: Calculate liquidation price (without fee initially)
         liquidationPrice = entryPrice - marginPerUnitCalc;
         liquidationCalcSteps.steps.push({
           step: stepCounter++,
-          description: 'Calculate liquidation price',
+          description: 'Calculate initial liquidation price',
           calculation: `${entryPrice} - ${marginPerUnitCalc.toFixed(4)} = ${liquidationPrice.toFixed(4)}`,
           result: liquidationPrice
         });
+        
+        // Step 5: Adjust liquidation price if liquidation fee is enabled
+        if (position.includeLiquidationFee) {
+          const liquidationFeeRate = 0.00025; // 0.025%
+          const initialLiqPrice = liquidationPrice;
+          
+          // For long positions, liquidation fee reduces the liquidation price
+          // Liquidation fee = liquidation fee rate * liquidation price * position size
+          // This fee effectively reduces available margin, so liquidation happens earlier
+          
+          // Calculate liquidation fee based on initial liquidation price
+          liquidationFee = liquidationFeeRate * initialLiqPrice * positionSize;
+          
+          // Recalculate margin difference with fee included
+          const adjustedMarginDiff = totalAvailableMargin - maintMargin - liquidationFee;
+          
+          // Recalculate margin per unit
+          const adjustedMarginPerUnit = adjustedMarginDiff / positionSize;
+          
+          // Recalculate liquidation price
+          liquidationPrice = entryPrice - adjustedMarginPerUnit;
+          
+          liquidationCalcSteps.steps.push({
+            step: stepCounter++,
+            description: 'Calculate liquidation fee',
+            calculation: `${liquidationFeeRate} * ${initialLiqPrice.toFixed(4)} * ${positionSize} = ${liquidationFee.toFixed(4)}`,
+            result: liquidationFee
+          });
+          
+          liquidationCalcSteps.steps.push({
+            step: stepCounter++,
+            description: 'Adjust margin difference with liquidation fee',
+            calculation: `${totalAvailableMargin.toFixed(4)} - ${maintMargin.toFixed(4)} - ${liquidationFee.toFixed(4)} = ${adjustedMarginDiff.toFixed(4)}`,
+            result: adjustedMarginDiff
+          });
+          
+          liquidationCalcSteps.steps.push({
+            step: stepCounter++,
+            description: 'Recalculate margin per unit',
+            calculation: `${adjustedMarginDiff.toFixed(4)} / ${positionSize} = ${adjustedMarginPerUnit.toFixed(4)}`,
+            result: adjustedMarginPerUnit
+          });
+          
+          liquidationCalcSteps.steps.push({
+            step: stepCounter++,
+            description: 'Calculate final liquidation price with fee',
+            calculation: `${entryPrice} - ${adjustedMarginPerUnit.toFixed(4)} = ${liquidationPrice.toFixed(4)}`,
+            result: liquidationPrice
+          });
+        }
       } else { // short
         // For short positions - using isolated formula with total available margin
         liquidationCalcSteps.formula = 'Entry Price + ((Total Available Margin - Position Size * MMR * Entry Price) / Position Size)';
@@ -606,14 +773,64 @@ export const CalculatorProvider = ({ children }) => {
           result: marginPerUnitCalc
         });
         
-        // Step 4: Calculate liquidation price
+        // Step 4: Calculate liquidation price (without fee initially)
         liquidationPrice = entryPrice + marginPerUnitCalc;
         liquidationCalcSteps.steps.push({
           step: stepCounter++,
-          description: 'Calculate liquidation price',
+          description: 'Calculate initial liquidation price',
           calculation: `${entryPrice} + ${marginPerUnitCalc.toFixed(4)} = ${liquidationPrice.toFixed(4)}`,
           result: liquidationPrice
         });
+        
+        // Step 5: Adjust liquidation price if liquidation fee is enabled
+        if (position.includeLiquidationFee) {
+          const liquidationFeeRate = 0.00025; // 0.025%
+          const initialLiqPrice = liquidationPrice;
+          
+          // For short positions, liquidation fee increases the liquidation price
+          // Liquidation fee = liquidation fee rate * liquidation price * position size
+          // This fee effectively reduces available margin, so liquidation happens earlier
+          
+          // Calculate liquidation fee based on initial liquidation price
+          liquidationFee = liquidationFeeRate * initialLiqPrice * positionSize;
+          
+          // Recalculate margin difference with fee included
+          const adjustedMarginDiff = totalAvailableMargin - maintMargin - liquidationFee;
+          
+          // Recalculate margin per unit
+          const adjustedMarginPerUnit = adjustedMarginDiff / positionSize;
+          
+          // Recalculate liquidation price
+          liquidationPrice = entryPrice + adjustedMarginPerUnit;
+          
+          liquidationCalcSteps.steps.push({
+            step: stepCounter++,
+            description: 'Calculate liquidation fee',
+            calculation: `${liquidationFeeRate} * ${initialLiqPrice.toFixed(4)} * ${positionSize} = ${liquidationFee.toFixed(4)}`,
+            result: liquidationFee
+          });
+          
+          liquidationCalcSteps.steps.push({
+            step: stepCounter++,
+            description: 'Adjust margin difference with liquidation fee',
+            calculation: `${totalAvailableMargin.toFixed(4)} - ${maintMargin.toFixed(4)} - ${liquidationFee.toFixed(4)} = ${adjustedMarginDiff.toFixed(4)}`,
+            result: adjustedMarginDiff
+          });
+          
+          liquidationCalcSteps.steps.push({
+            step: stepCounter++,
+            description: 'Recalculate margin per unit',
+            calculation: `${adjustedMarginDiff.toFixed(4)} / ${positionSize} = ${adjustedMarginPerUnit.toFixed(4)}`,
+            result: adjustedMarginPerUnit
+          });
+          
+          liquidationCalcSteps.steps.push({
+            step: stepCounter++,
+            description: 'Calculate final liquidation price with fee',
+            calculation: `${entryPrice} + ${adjustedMarginPerUnit.toFixed(4)} = ${liquidationPrice.toFixed(4)}`,
+            result: liquidationPrice
+          });
+        }
       }
     }
     

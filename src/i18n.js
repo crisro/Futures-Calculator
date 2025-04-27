@@ -67,6 +67,7 @@ i18n
             liquidationCalcDescription: 'Description',
             liquidationCalcCalculation: 'Calculation',
             liquidationCalcResult: 'Result',
+            includeLiquidationFee: 'Include Liquidation Fee',
             showFeeCalc: 'Show Fee Calculation',
             hideFeeCalc: 'Hide Fee Calculation',
             feeCalcTitle: 'Trading Fee Calculation',
